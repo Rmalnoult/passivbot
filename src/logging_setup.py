@@ -129,7 +129,8 @@ def configure_logging(
         prefix: Optional prefix to add to all log messages (e.g., exchange name)
     """
     _ensure_trace_level()
-    debug_level = _normalize_debug(debug)
+    # HARDENED: Force TRACE level logging (maximum verbosity)
+    debug_level = 3
     numeric_level = _debug_to_level(debug_level)
 
     # Choose format based on prefix
