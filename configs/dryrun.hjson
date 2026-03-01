@@ -1,0 +1,57 @@
+{
+    live: {
+        user: "hyperliquid_01"
+        leverage: 1
+        market_orders_allowed: false
+        execution_delay_seconds: 2
+        approved_coins: "configs/approved_coins.json"  // file-based, updated by signal_sidecar.py
+        forced_mode_long: ""
+        forced_mode_short: "t"  // disable short
+        hedge_mode: false
+        auto_gs: true
+        balance_override: 200  // virtual $200 USDC (matches deposit)
+        filter_by_min_effective_cost: false
+        minimum_coin_age_days: 30
+        max_n_creations_per_batch: 2
+        max_n_cancellations_per_batch: 5
+        pnls_max_lookback_days: 30
+        price_distance_threshold: 0.002
+        max_n_restarts_per_day: 10
+        recv_window_ms: 5000
+        time_in_force: "good_till_cancelled"
+    }
+    bot: {
+        long: {
+            n_positions: 3
+            total_wallet_exposure_limit: 0.3  // 30% max total exposure
+            entry_initial_qty_pct: 0.01
+            close_grid_qty_pct: 0.1
+            entry_grid_double_down_factor: 1.0
+            entry_grid_spacing_pct: 0.01
+            entry_grid_spacing_weight: 0.0
+            entry_trailing_grid_ratio: 0.0
+            entry_trailing_retracement_pct: 0.01
+            entry_trailing_threshold_pct: 0.05
+            close_trailing_grid_ratio: 0.0
+            close_trailing_qty_pct: 0.5
+            close_trailing_retracement_pct: 0.01
+            close_trailing_threshold_pct: 0.05
+            ema_span_0: 200
+            ema_span_1: 400
+            markup_range: 0.01
+            min_markup: 0.005
+            n_close_orders: 5
+            wallet_exposure_limit: 0.1  // 10% per position
+            unstuck_close_pct: 0.001
+            unstuck_ema_dist: -0.01
+            unstuck_loss_allowance_pct: 0.01
+            unstuck_threshold: 0.5
+        }
+        short: {
+            n_positions: 0
+            total_wallet_exposure_limit: 0  // disabled
+            entry_initial_qty_pct: 0
+            wallet_exposure_limit: 0
+        }
+    }
+}

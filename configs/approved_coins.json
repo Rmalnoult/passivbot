@@ -1,1 +1,7 @@
-["BTC", "ETH", "BNB", "XRP", "SOL", "TRX", "DOGE", "ADA", "BCH", "XMR", "LINK", "HYPE", "CC", "XLM", "ZEC", "LTC", "SUI", "AVAX", "SHIB", "HBAR", "TON", "CRO", "DOT", "UNI", "XAUT", "MNT"]
+{
+  "long": [
+    "BTC",
+    "SOL"
+  ],
+  "short": []
+}
