@@ -5875,20 +5875,20 @@ class Passivbot:
             "price": order["price"],
             "params": self._build_order_params(order),
         }
-        # DRY-RUN MODE: log order instead of executing
-        logging.info(
-            f"[DRY-RUN] Would create order: {order['side']} {abs(order['qty'])} "
-            f"{order['symbol']} @ {order['price']} (type={order.get('type', 'limit')})"
-        )
-        return {
-            "id": f"dryrun_{order['symbol']}_{order['side']}_{order['price']}",
-            "symbol": order["symbol"],
-            "side": order["side"],
-            "amount": abs(order["qty"]),
-            "price": order["price"],
-            "status": "dry_run",
-            "type": order.get("type", "limit"),
-        }
+        executed = None
+        try:
+            executed = await self.cca.create_order(**params)
+            if executed is not None:
+                logging.info(
+                    f"[LIVE] Order placed: {order['side']} {abs(order['qty'])} "
+                    f"{order['symbol']} @ {order['price']} (id={executed.get('id', '?')})"
+                )
+            return executed
+        except Exception as e:
+            logging.error(f"error executing order {order} {e}")
+            print_async_exception(executed)
+            traceback.print_exc()
+            raise
 
     async def execute_orders(self, orders: [dict]) -> [dict]:
         """Execute a batch of order creations using the helper pipeline."""
@@ -5896,9 +5896,6 @@ class Passivbot:
 
     async def execute_cancellation(self, order: dict) -> dict:
         """Cancel a single order via the exchange client."""
-        # DRY-RUN MODE: log cancellation instead of executing
-        logging.info(f"[DRY-RUN] Would cancel order: {order.get('id', 'unknown')} on {order['symbol']}")
-        return {"id": order.get("id", "unknown"), "status": "dry_run_cancelled"}
         executed = None
         try:
             executed = await self.cca.cancel_order(order["id"], symbol=order["symbol"])
