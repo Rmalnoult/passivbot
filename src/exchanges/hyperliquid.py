@@ -187,9 +187,26 @@ class HyperliquidBot(CCXTBot):
             }
             for x in info["info"]["assetPositions"]
         ]
-        balance = float(info["info"]["marginSummary"]["accountValue"]) - sum(
+        perps_value = float(info["info"]["marginSummary"]["accountValue"])
+        unrealized_pnl = sum(
             [float(x["position"]["unrealizedPnl"]) for x in info["info"]["assetPositions"]]
         )
+        balance = perps_value - unrealized_pnl
+        # Unified Account: perps clearinghouse may report 0 while funds are in spot.
+        # Fall back to spot USDC balance so the bot sees available collateral.
+        if balance < 1e-6:
+            try:
+                spot_info = await self.cca.fetch_balance({"type": "spot"})
+                spot_usdc = float(spot_info.get("USDC", {}).get("total", 0.0))
+                if spot_usdc > 0:
+                    logging.info(
+                        "[balance] perps clearinghouse reports 0; using spot USDC balance: %.2f"
+                        " (Unified Account detected)",
+                        spot_usdc,
+                    )
+                    balance = spot_usdc
+            except Exception as e:
+                logging.warning("[balance] failed to fetch spot balance: %s", e)
         return positions, balance
 
     async def fetch_positions(self):
